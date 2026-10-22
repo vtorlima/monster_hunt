@@ -19,10 +19,30 @@ desenho(X, Y, _, S) :- item(_, X, Y, N), !, simbolo(S, item(N)).
 desenho(X, Y, M, S) :- memberchk(X-Y-S, M), !.
 desenho(_, _, _, '.').
 
-% mostrar_caminho(+Plano): o quintal com as celulas do plano marcadas com *
+% mostrar_caminho(+Plano): o quintal com o plano marcado
+%   > celula usada so na ida   < so na volta   + nas duas
 mostrar_caminho(Plano) :-
-    findall(X-Y-'*', ( member(E, Plano), posicao(E, X, Y) ), Marcas),
-    mostrar_mapa(Marcas).
+    findall(X-Y-S,
+            ( member(E, Plano), posicao(E, X, Y), marca(Plano, X, Y, S) ),
+            Marcas0),
+    sort(Marcas0, Marcas),
+    mostrar_mapa(Marcas),
+    writeln('(> ida   < volta   + ida e volta)').
+
+marca(Plano, X, Y, S) :-
+    ( passou(Plano, X, Y, ida)   -> Ida = sim ; Ida = nao ),
+    ( passou(Plano, X, Y, volta) -> Volta = sim ; Volta = nao ),
+    simbolo_marca(Ida, Volta, S).
+
+passou(Plano, X, Y, Trecho) :-
+    member(E, Plano),
+    posicao(E, X, Y),
+    boca(E, Boca),
+    ( memberchk(bolinha, Boca) -> Trecho = volta ; Trecho = ida ).
+
+simbolo_marca(sim, nao, '>').
+simbolo_marca(nao, sim, '<').
+simbolo_marca(sim, sim, '+').
 
 % ---------- Plano em linguagem natural ----------
 % resolver: roda a busca a partir do estado inicial e conta o resultado
@@ -34,9 +54,9 @@ resolver :-
         mostrar_caminho(Plano), nl,
         imprime_plano(Plano),
         length(Plano, T), Acoes is T - 1,
-        format("~nO cachorro chega a bolinha em ~w acoes. Estados expandidos: ~w.~n", [Acoes, N])
+        format("~nBolinha devolvida em ~w acoes. Estados expandidos: ~w.~n", [Acoes, N])
     ;   nb_getval(expandidos, N),
-        format("Falha: o cachorro nao consegue chegar a bolinha (~w estados expandidos).~n", [N])
+        format("Falha: nao ha como trazer a bolinha de volta ao dono (~w estados expandidos).~n", [N])
     ).
 
 imprime_plano(Plano) :-
@@ -58,8 +78,16 @@ imprime_passos([E1, E2 | Resto], N) :-
     imprime_passos([E2 | Resto], N1).
 
 % eventos(+Antes, +Depois): o que acontece ao entrar na nova celula
-eventos(_, E2) :- meta(E2), !, write(' e chega a bolinha').
-eventos(_, _).
+eventos(E1, E2) :-
+    boca(E1, B1),
+    boca(E2, B2),
+    forall(( member(I, B2), \+ memberchk(I, B1) ),
+           ( nome_item(I, Nome), format(" e pega ~w", [Nome]) )),
+    ( meta(E2) -> write(' e devolve a bolinha ao dono') ; true ).
+
+nome_item(bolinha, 'a bolinha').
+nome_item(osso,    'o osso').
+nome_item(espinha, 'a espinha de peixe').
 
 texto_acao(cima,     'cima').
 texto_acao(baixo,    'baixo').
