@@ -81,15 +81,13 @@ imprime_passos([E1, E2 | Resto], N) :-
 
 % eventos(+Antes, +Depois): o que acontece ao entrar na nova celula
 eventos(E1, E2) :-
-    posicao(E1, X1, Y1),
-    posicao(E2, X2, Y2),
-    boca(E1, B1),
-    forall(( zona(X2, Y2, Id, Tipo), \+ zona(X1, Y1, Id, _) ),
+    feitos(E1, F1),
+    feitos(E2, F2),
+    forall(( member(Id, F2), \+ memberchk(Id, F1), animal(Id, _, _, Tipo) ),
            ( acalma(Item, Tipo), nome_item(Item, NomeItem),
-             format(" e passa pelo ~w bravo mostrando ~w", [Tipo, NomeItem]) )),
-    boca(E2, B2),
-    forall(( member(I, B2), \+ memberchk(I, B1) ),
-           ( nome_item(I, Nome), format(" e pega ~w", [Nome]) )),
+             format(": entrega ~w ao ~w bravo, que deita e fica roendo", [NomeItem, Tipo]) )),
+    forall(( member(Id, F2), \+ memberchk(Id, F1), item(Id, _, _, Nome) ),
+           ( nome_item(Nome, NomeItem), format(" e pega ~w", [NomeItem]) )),
     ( meta(E2) -> write(' e devolve a bolinha ao dono') ; true ).
 
 nome_item(bolinha, 'a bolinha').
