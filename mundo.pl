@@ -3,7 +3,8 @@
 % Cachorros e gatos bravos guardam uma zona (a propria celula e as 4 vizinhas).
 % Para atravessar a zona, o cachorro entrega o item que acalma aquele animal:
 % osso para cachorro, espinha de peixe para gato. O item se gasta e o animal
-% fica deitado, roendo, para sempre.
+% fica deitado, roendo, para sempre. Mas com a bolinha na boca, nenhum cachorro
+% (bravo ou acalmado) deixa passar: ele roubaria a bolinha. Gatos nao ligam.
 % Os fatos do cenario atual sao criados por carregar/1 (cenarios.pl):
 %   tamanho(L, A), dono(X, Y), muro(X, Y), animal(Id, X, Y, Tipo), item(Id, X, Y, Nome)
 %
@@ -64,12 +65,21 @@ coleta(X, Y, Boca, Feitos, Boca2, Feitos2) :-
     ord_add_element(Feitos, Id, Feitos2).
 coleta(_, _, Boca, Feitos, Boca, Feitos).
 
+% R6 - Bolinha: carregando a bolinha, o cachorro nunca entra na zona de outro
+%      cachorro, nem de um acalmado (ele roubaria a bolinha para brincar).
+%      Gatos nao se interessam pela bolinha.
+seguro_com_bolinha(X, Y, Boca) :-
+    memberchk(bolinha, Boca), !,
+    \+ zona(X, Y, _, cachorro).
+seguro_com_bolinha(_, _, _).
+
 % R7 - Sucessor: UMA regra geral para todos os estados
 s(estado(X, Y, B, F), estado(X2, Y2, B2, F2)) :-
     movimento(_, DX, DY),
     X2 is X + DX,
     Y2 is Y + DY,
     livre(X2, Y2),
+    seguro_com_bolinha(X2, Y2, B),
     atravessa(X2, Y2, B, F, B1, F1),
     coleta(X2, Y2, B1, F1, B2, F2).
 

@@ -26,6 +26,22 @@ cenario(d, ["D....#....",         % um cachorro bravo guarda o atalho
             ".....#....",
             ".........."]).
 
+cenario(e, ["D....#.........",    % principal: ida pelo cachorro (osso), volta pelo gato (espinha)
+            ".....C.........",
+            ".o...#.........",
+            ".....#......b..",
+            ".....#..e......",
+            ".....G.........",
+            ".....#........."]).
+
+cenario(f, ["D....#.........",    % igual ao E, sem a espinha: pega a bolinha mas nao volta
+            ".....C.........",
+            ".o...#.........",
+            ".....#......b..",
+            ".....#.........",
+            ".....G.........",
+            ".....#........."]).
+
 cenario(g, ["D....##........",    % dois cachorros guardam a passagem; ha um osso so
             ".....CC........",
             ".o...##........",
