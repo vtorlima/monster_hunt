@@ -1,7 +1,10 @@
 % mundo.pl - regras do quintal
 % Historia: um cachorro sai do lado do dono, busca a bolinha e a devolve.
+% Cachorros e gatos bravos guardam uma zona (a propria celula e as 4 vizinhas).
+% So atravessa a zona quem tem o item que acalma o animal: osso para cachorro,
+% espinha de peixe para gato.
 % Os fatos do cenario atual sao criados por carregar/1 (cenarios.pl):
-%   tamanho(L, A), dono(X, Y), muro(X, Y), item(Id, X, Y, Nome)
+%   tamanho(L, A), dono(X, Y), muro(X, Y), animal(Id, X, Y, Tipo), item(Id, X, Y, Nome)
 %
 % Estado: estado(X, Y, Boca)
 %   Boca = itens que o cachorro carrega (lista ordenada)
@@ -13,6 +16,10 @@ movimento(baixo,     0,  1).
 movimento(esquerda, -1,  0).
 movimento(direita,   1,  0).
 
+% Qual item acalma qual tipo de animal
+acalma(osso,    cachorro).
+acalma(espinha, gato).
+
 % R1 - Limites: a celula esta dentro do grid
 dentro(X, Y) :-
     tamanho(L, A),
@@ -23,6 +30,21 @@ dentro(X, Y) :-
 livre(X, Y) :-
     dentro(X, Y),
     \+ muro(X, Y).
+
+% R3 - Zona de um animal: a celula dele e as 4 vizinhas
+zona(X, Y, Id, Tipo) :-
+    animal(Id, X, Y, Tipo).
+zona(X, Y, Id, Tipo) :-
+    animal(Id, AX, AY, Tipo),
+    movimento(_, DX, DY),
+    X =:= AX + DX,
+    Y =:= AY + DY.
+
+% R4 - Atravessar: so entra na zona de um animal quem tem na boca o item
+%      que acalma aquele tipo de animal
+pode_passar(X, Y, Boca) :-
+    forall(zona(X, Y, _, Tipo),
+           ( acalma(Item, Tipo), memberchk(Item, Boca) )).
 
 % R5 - Coleta: entrar numa celula com item coloca-o na boca
 coleta(X, Y, Boca, Boca2) :-
@@ -36,6 +58,7 @@ s(estado(X, Y, B), estado(X2, Y2, B2)) :-
     X2 is X + DX,
     Y2 is Y + DY,
     livre(X2, Y2),
+    pode_passar(X2, Y2, B),
     coleta(X2, Y2, B, B2).
 
 % R8 - Meta: estar de volta ao dono COM a bolinha

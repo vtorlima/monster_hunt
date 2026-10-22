@@ -1,7 +1,7 @@
 % saida.pl - impressao do quintal e do plano em linguagem natural
 
 % ---------- Mapa ----------
-% mostrar_mapa: imprime o cenario carregado em ASCII
+% mostrar_mapa: imprime o cenario carregado em ASCII (~ = zona de animal bravo)
 mostrar_mapa :-
     mostrar_mapa([]).
 
@@ -15,8 +15,10 @@ mostrar_mapa(Marcas) :-
 
 desenho(X, Y, _, S) :- dono(X, Y), !, simbolo(S, dono).
 desenho(X, Y, _, S) :- muro(X, Y), !, simbolo(S, muro).
+desenho(X, Y, _, S) :- animal(_, X, Y, T), !, simbolo(S, animal(T)).
 desenho(X, Y, _, S) :- item(_, X, Y, N), !, simbolo(S, item(N)).
 desenho(X, Y, M, S) :- memberchk(X-Y-S, M), !.
+desenho(X, Y, _, '~') :- zona(X, Y, _, _), !.
 desenho(_, _, _, '.').
 
 % mostrar_caminho(+Plano): o quintal com o plano marcado
@@ -79,7 +81,12 @@ imprime_passos([E1, E2 | Resto], N) :-
 
 % eventos(+Antes, +Depois): o que acontece ao entrar na nova celula
 eventos(E1, E2) :-
+    posicao(E1, X1, Y1),
+    posicao(E2, X2, Y2),
     boca(E1, B1),
+    forall(( zona(X2, Y2, Id, Tipo), \+ zona(X1, Y1, Id, _) ),
+           ( acalma(Item, Tipo), nome_item(Item, NomeItem),
+             format(" e passa pelo ~w bravo mostrando ~w", [Tipo, NomeItem]) )),
     boca(E2, B2),
     forall(( member(I, B2), \+ memberchk(I, B1) ),
            ( nome_item(I, Nome), format(" e pega ~w", [Nome]) )),

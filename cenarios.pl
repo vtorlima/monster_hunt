@@ -1,5 +1,7 @@
 % cenarios.pl - mapas dos cenarios e carregamento
-% Legenda: D dono (o cachorro sai daqui)   # muro   . livre   b bolinha
+% Legenda: D dono (o cachorro sai e volta aqui)   # muro   . livre
+%          C cachorro bravo   G gato bravo
+%          b bolinha   o osso (acalma cachorros)   e espinha (acalma gatos)
 
 % ---------- Cenarios ----------
 cenario(a, ["........",           % campo aberto
@@ -17,6 +19,20 @@ cenario(c, ["...#....",           % a bolinha caiu num cercado fechado
             "...#.#b#",
             "...#.###",
             "...#...."]).
+
+cenario(d, ["D....#....",         % um cachorro bravo guarda o atalho
+            ".....C...b",
+            ".o...#....",
+            ".....#....",
+            ".........."]).
+
+cenario(g, ["D....##........",    % dois cachorros guardam a passagem; ha um osso so
+            ".....CC........",
+            ".o...##........",
+            ".....##.....b..",
+            ".....##.e......",
+            "......G........",
+            ".....##........"]).
 
 % ---------- Carregamento ----------
 % carregar(+Nome): carrega um cenario pelo nome (configuracao "nas regras")
@@ -49,7 +65,11 @@ limpar :-
 % simbolo(?Caractere, ?Tipo): tabela da legenda (usada para ler e para desenhar)
 simbolo('#', muro).
 simbolo('D', dono).
+simbolo('C', animal(cachorro)).
+simbolo('G', animal(gato)).
 simbolo(b,   item(bolinha)).
+simbolo(o,   item(osso)).
+simbolo(e,   item(espinha)).
 
 % celula(+Caractere, +X, +Y): cria o fato correspondente ao simbolo
 celula('.', _, _) :- !.
