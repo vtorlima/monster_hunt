@@ -98,3 +98,24 @@ texto_acao(cima,     'cima').
 texto_acao(baixo,    'baixo').
 texto_acao(esquerda, 'a esquerda').
 texto_acao(direita,  'a direita').
+
+% ---------- Comparacao de algoritmos ----------
+% comparar(+Nome): roda Largura e Profundidade no mesmo cenario
+comparar(Nome) :-
+    carregar(Nome),
+    format("Cenario ~w~n", [Nome]),
+    format("~w~t~16|~w~t~26|~w~t~40|~w~n", ['Algoritmo', 'Acoes', 'Expandidos', 'Tempo (s)']),
+    forall(member(Estrategia, [largura, profundidade]),
+           linha_comparacao(Estrategia)).
+
+linha_comparacao(Estrategia) :-
+    estado_inicial(Inicial),
+    statistics(cputime, T0),
+    (   busca(Estrategia, Inicial, Caminho)
+    ->  length(Caminho, T), Acoes is T - 1
+    ;   Acoes = falha
+    ),
+    statistics(cputime, T1),
+    Tempo is T1 - T0,
+    nb_getval(expandidos, N),
+    format("~w~t~16|~w~t~26|~w~t~40|~3f~n", [Estrategia, Acoes, N, Tempo]).
