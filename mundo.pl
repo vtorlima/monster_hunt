@@ -30,6 +30,10 @@ s(estado(X, Y), estado(X2, Y2)) :-
     Y2 is Y + DY,
     livre(X2, Y2).
 
+% R8 - Meta: chegar a celula da bolinha
+meta(estado(X, Y)) :-
+    item(_, X, Y, bolinha).
+
 % Posicao de um estado (os dois primeiros argumentos)
 posicao(Estado, X, Y) :-
     arg(1, Estado, X),

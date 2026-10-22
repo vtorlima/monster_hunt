@@ -6,7 +6,8 @@
 :- ensure_loaded(busca).
 :- ensure_loaded(saida).
 
-% rodar(+Nome): carrega o cenario e mostra o quintal
+% rodar(+Nome): carrega o cenario, mostra o quintal e resolve
 rodar(Nome) :-
     carregar(Nome),
-    mostrar_mapa.
+    mostrar_mapa, nl,
+    resolver.
