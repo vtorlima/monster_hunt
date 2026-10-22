@@ -5,6 +5,8 @@
 :- ensure_loaded(cenarios).
 :- ensure_loaded(busca).
 :- ensure_loaded(saida).
-:- ensure_loaded(testes).
 
-ola :- writeln('Projeto carregado com sucesso.').
+% rodar(+Nome): carrega o cenario e mostra o quintal
+rodar(Nome) :-
+    carregar(Nome),
+    mostrar_mapa.

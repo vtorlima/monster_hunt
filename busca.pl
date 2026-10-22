@@ -1,1 +1,1 @@
-% busca.pl - solucao_bl/2, solucao_bp/2, solucao_pi/2
+% busca.pl - algoritmos de busca (a partir do passo 4)
